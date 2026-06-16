@@ -1,26 +1,26 @@
 # koin-proxy
 
-This project is a small Android/Kotlin sample for comparing direct Koin usage with a thin proxy layer over Koin.
+本项目是一个小型的 Android/Kotlin 示例，用于对比直接使用 Koin 与通过一层薄代理使用 Koin 两种方式。
 
-## Modules
+## 模块
 
 ### `:app`
 
-Android Compose demo app.
+基于 Android Compose 的示例应用。
 
-It depends on:
+它依赖：
 
 - `:koin-proxy`
 - `:example-with-koin-proxy`
 - `:example-with-koin-direct`
 
-The app starts Koin through the proxy API, loads the sample modules, and displays strings returned by each sample API.
+应用通过代理 API 启动 Koin，加载示例模块，并展示各个示例 API 返回的字符串。
 
 ### `:koin-proxy`
 
-Thin wrapper module around Koin.
+对 Koin 进行封装的薄代理模块。
 
-This module owns the real Koin dependency and exposes a small project-defined API:
+该模块持有真正的 Koin 依赖，对外暴露一套项目自定义的 API：
 
 - `koinProxyModule { ... }`
 - `single(SomeType::class) { ... }`
@@ -28,23 +28,23 @@ This module owns the real Koin dependency and exposes a small project-defined AP
 - `getSingle(SomeType::class)`
 - `injectSingle(SomeType::class)`
 
-The goal is to let app or feature modules avoid importing `org.koin.*` directly when they choose to use the proxy layer.
+其目标是让 app 或 feature 模块在选择使用代理层时，无需直接引入 `org.koin.*`。
 
 ### `:example-with-koin-proxy`
 
-Example feature module using `:koin-proxy`.
+使用 `:koin-proxy` 的示例 feature 模块。
 
-It registers `ProxyExampleService` through `koinProxyModule`, then exposes `proxyExampleValue()` as a simple public API. The API resolves the service through the proxy and returns a string from it.
+它通过 `koinProxyModule` 注册 `ProxyExampleService`，并以 `proxyExampleValue()` 作为简单的对外 API。该 API 通过代理解析对应服务，并返回其中的字符串。
 
 ### `:example-with-koin-direct`
 
-Example feature module using Koin directly.
+直接使用 Koin 的示例 feature 模块。
 
-It depends on `koin-core`, defines a native Koin `module { single { ... } }`, loads that module into the global Koin context, and exposes `directKoinExampleValue()` as a simple public API.
+它依赖 `koin-core`，定义原生 Koin 的 `module { single { ... } }`，将该模块加载到全局 Koin 上下文中，并以 `directKoinExampleValue()` 作为简单的对外 API。
 
-This module is intentionally kept as a contrast case for direct Koin usage.
+此模块作为直接使用 Koin 的对照示例而保留。
 
-## Dependency Direction
+## 依赖方向
 
 ```text
 :app
@@ -53,7 +53,7 @@ This module is intentionally kept as a contrast case for direct Koin usage.
   └── :example-with-koin-direct ────────────────> Koin
 ```
 
-## Build
+## 构建
 
 ```bash
 ./gradlew :app:assembleDebug
