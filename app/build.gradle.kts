@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":example-with-koin-direct"))
     implementation(project(":example-with-koin-proxy"))
     implementation(project(":koin-proxy"))
+    implementation(project(":koin-proxy-api"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)

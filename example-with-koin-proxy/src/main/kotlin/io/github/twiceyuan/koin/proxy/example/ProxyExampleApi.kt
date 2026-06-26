@@ -8,9 +8,9 @@ class ProxyExampleService {
 }
 
 val proxyExampleModule = koinProxyModule {
-    single(ProxyExampleService::class) { ProxyExampleService() }
+    single { ProxyExampleService() }
 }
 
 fun proxyExampleValue(): String {
-    return getSingle(ProxyExampleService::class).value()
+    return getSingle<ProxyExampleService>().value()
 }

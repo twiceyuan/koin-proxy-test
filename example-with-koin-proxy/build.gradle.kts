@@ -14,5 +14,5 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":koin-proxy"))
+    implementation(project(":koin-proxy-api"))
 }

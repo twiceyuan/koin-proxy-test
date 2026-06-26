@@ -1,6 +1,8 @@
 # koin-proxy
 
-本项目是一个小型的 Android/Kotlin 示例，用于对比直接使用 Koin 与通过一层薄代理使用 Koin 两种方式。
+本项目是一个小型的 Android/Kotlin 示例，用于对比直接使用 Koin 与通过桥接层使用 Koin 两种方式。
+
+桥接层的目标是严格隔离 Koin：业务模块只引用 `:koin-proxy-api`，编译出来的业务模块字节码里不包含 `org.koin.*` / `org/koin` 引用。真正的 Koin 依赖只存在于 `:koin-proxy` 实现模块中。
 
 ## 模块
 
@@ -10,31 +12,48 @@
 
 它依赖：
 
+- `:koin-proxy-api`
 - `:koin-proxy`
 - `:example-with-koin-proxy`
 - `:example-with-koin-direct`
 
-应用通过代理 API 启动 Koin，加载示例模块，并展示各个示例 API 返回的字符串。
+应用通过 `:koin-proxy` 启动真实 Koin 运行时，通过 `:koin-proxy-api` 定义和获取对象，并展示各个示例 API 返回的字符串。
+
+### `:koin-proxy-api`
+
+桥接层的纯 API 模块，不依赖 Koin。
+
+该模块只暴露项目自定义的 API 和定义模型：
+
+- `koinProxyModule { ... }`
+- `single { ... }`
+- `single(SomeType::class) { ... }`
+- `getSingle<SomeType>()`
+- `getSingle(SomeType::class)`
+- `injectSingle<SomeType>()`
+- `injectSingle(SomeType::class)`
+
+其中 reified inline API 只会把 `T` 转成 `KClass`，然后调用桥接层自己的非 inline API，不会 inline 任何 Koin 调用到业务模块字节码中。
 
 ### `:koin-proxy`
 
-对 Koin 进行封装的薄代理模块。
+桥接层的 Koin 实现模块。
 
-该模块持有真正的 Koin 依赖，对外暴露一套项目自定义的 API：
+该模块持有真正的 Koin 依赖，负责：
 
-- `koinProxyModule { ... }`
-- `single(SomeType::class) { ... }`
 - `startKoinProxy(...)`
-- `getSingle(SomeType::class)`
-- `injectSingle(SomeType::class)`
+- 将 `:koin-proxy-api` 中的定义模型转换为 Koin Module
+- 安装基于 Koin 的运行时解析器
 
-其目标是让 app 或 feature 模块在选择使用代理层时，无需直接引入 `org.koin.*`。
+业务模块不应该直接依赖或导入该模块中的 Koin 相关实现细节；通常只由 app 启动阶段使用它来接入真实运行时。
 
 ### `:example-with-koin-proxy`
 
-使用 `:koin-proxy` 的示例 feature 模块。
+使用 `:koin-proxy-api` 的示例 feature 模块。
 
-它通过 `koinProxyModule` 注册 `ProxyExampleService`，并以 `proxyExampleValue()` 作为简单的对外 API。该 API 通过代理解析对应服务，并返回其中的字符串。
+它通过 `koinProxyModule` 注册 `ProxyExampleService`，并以 `proxyExampleValue()` 作为简单的对外 API。该 API 通过桥接层解析对应服务，并返回其中的字符串。
+
+该模块不依赖 Koin，编译产物中不应出现 `org.koin.*` / `org/koin`。
 
 ### `:example-with-koin-direct`
 
@@ -48,9 +67,11 @@
 
 ```text
 :app
-  ├── :koin-proxy
-  ├── :example-with-koin-proxy ──> :koin-proxy ──> Koin
-  └── :example-with-koin-direct ────────────────> Koin
+  ├── :koin-proxy-api
+  ├── :koin-proxy ───────────────> :koin-proxy-api
+  │                                └── Koin
+  ├── :example-with-koin-proxy ──> :koin-proxy-api
+  └── :example-with-koin-direct ─> Koin
 ```
 
 ## 构建
@@ -58,3 +79,14 @@
 ```bash
 ./gradlew :app:assembleDebug
 ```
+
+## 隔离验证
+
+可以用下面的方式检查使用桥接层的模块字节码中是否存在 Koin 引用：
+
+```bash
+rg -a "org[./]koin" koin-proxy-api/build/libs koin-proxy-api/build/classes
+rg -a "org[./]koin" example-with-koin-proxy/build/libs example-with-koin-proxy/build/classes
+```
+
+预期结果是没有输出。

@@ -17,7 +17,7 @@ import io.github.twiceyuan.koin.proxy.example.proxyExampleValue
 import io.github.twiceyuan.koin.proxy.ui.theme.KoinproxyTheme
 
 class MainActivity : ComponentActivity() {
-    private val greetingRepository: GreetingRepository by injectSingle(GreetingRepository::class)
+    private val greetingRepository: GreetingRepository by injectSingle()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
