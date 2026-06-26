@@ -15,6 +15,6 @@ kotlin {
 
 dependencies {
     api(project(":koin-proxy-api"))
-    implementation(platform(libs.koin.bom))
-    implementation(libs.koin.core)
+    implementation(platform(libs.koin4.bom))
+    implementation(libs.koin4.core)
 }

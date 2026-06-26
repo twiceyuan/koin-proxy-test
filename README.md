@@ -4,6 +4,8 @@
 
 桥接层的目标是严格隔离 Koin：业务模块只引用 `:koin-proxy-api`，编译出来的业务模块字节码里不包含 `org.koin.*` / `org/koin` 引用。真正的 Koin 依赖只存在于 `:koin-proxy` 实现模块中。
 
+当前 `:koin-proxy` 实现层使用 Koin `3.1.5`。项目曾从 Koin `4.2.2` 迁移到 `3.1.5`，迁移时只需要调整实现层和版本声明，`koin-proxy-api` 与使用桥接层的业务模块 API 不需要变化。
+
 ## 模块
 
 ### `:app`

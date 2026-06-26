@@ -26,6 +26,7 @@ rootProject.name = "koin-proxy"
 include(":app")
 include(":example-with-koin-direct")
 include(":example-with-koin-proxy")
-include(":koin-proxy")
+include(":koin-3-proxy")
+include(":koin-4-proxy")
 include(":koin-proxy-api")
  

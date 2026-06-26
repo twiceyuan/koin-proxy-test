@@ -3,6 +3,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+val koinProxyMajor = providers.gradleProperty("koinProxyMajor").orElse("3").get()
+val koinProxyModule = when (koinProxyMajor) {
+    "3" -> ":koin-3-proxy"
+    "4" -> ":koin-4-proxy"
+    else -> error("Unsupported koinProxyMajor=$koinProxyMajor. Use 3 or 4.")
+}
+
 android {
     namespace = "io.github.twiceyuan.koin.proxy"
     compileSdk {
@@ -41,7 +48,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(project(":example-with-koin-direct"))
     implementation(project(":example-with-koin-proxy"))
-    implementation(project(":koin-proxy"))
+    implementation(project(koinProxyModule))
     implementation(project(":koin-proxy-api"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

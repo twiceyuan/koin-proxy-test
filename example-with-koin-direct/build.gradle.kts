@@ -14,6 +14,13 @@ kotlin {
 }
 
 dependencies {
-    implementation(platform(libs.koin.bom))
-    implementation(libs.koin.core)
+    val koinProxyMajor = providers.gradleProperty("koinProxyMajor").orElse("3").get()
+    when (koinProxyMajor) {
+        "3" -> implementation(libs.koin3.core)
+        "4" -> {
+            implementation(platform(libs.koin4.bom))
+            implementation(libs.koin4.core)
+        }
+        else -> error("Unsupported koinProxyMajor=$koinProxyMajor. Use 3 or 4.")
+    }
 }
