@@ -9,6 +9,11 @@ val koinProxyModule = when (koinProxyMajor) {
     "4" -> ":koin-4-proxy"
     else -> error("Unsupported koinProxyMajor=$koinProxyMajor. Use 3 or 4.")
 }
+val koinDirectExampleModule = when (koinProxyMajor) {
+    "3" -> ":example-with-direct-koin-3"
+    "4" -> ":example-with-direct-koin-4"
+    else -> error("Unsupported koinProxyMajor=$koinProxyMajor. Use 3 or 4.")
+}
 
 android {
     namespace = "io.github.twiceyuan.koin.proxy"
@@ -46,7 +51,7 @@ android {
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
-    implementation(project(":example-with-koin-direct"))
+    implementation(project(koinDirectExampleModule))
     implementation(project(":example-with-koin-proxy"))
     implementation(project(koinProxyModule))
     implementation(project(":koin-proxy-api"))
